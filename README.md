@@ -29,28 +29,72 @@ The pipeline captures 543 spatiotemporal landmarks using the **MediaPipe Holisti
 
 ---
 
-## 🏗️ System Architecture & Dataflow
+## 🏗️ System Architecture
 
-Our system operates on a highly optimized, 5-stage edge-computing pipeline designed to run on consumer hardware without thermal throttling:
+Our project is structured across three distinct computational layers running entirely on the edge device to ensure zero-latency communication without requiring cloud processing.
 
 ```mermaid
 graph TD
-    A[Camera Input] -->|Standby Mode| B{Wake Gesture Detected?}
-    B -- No --> A
-    B -- Yes: Open Hand for 2s --> C[MediaPipe Holistic]
-    C -->|Extract 543 Landmarks| D[Coordinate Normalization]
-    D -->|Nose Origin + Shoulder Scale| E[Inference Engine]
-    E -->|Wrist-to-Fingertip Distances| F[Classification / LSTM]
-    F -->|Translated ISL Gloss| G[AR Output Module]
-    G -->|Raycast to physical 3D Space| H[Unity AR / Web Canvas Display]
+    subgraph Frontend [User Interface Layer]
+        A1[Unity Mobile App ARCore/ARKit]
+        A2[Web Presentation Dashboard]
+    end
+
+    subgraph EdgeDevice [Edge Computing Layer]
+        B1[Local Camera Capture]
+        B2[Local Networking UDP / WebSockets]
+    end
+
+    subgraph AI [Artificial Intelligence Layer]
+        C1[MediaPipe Holistic Feature Extractor]
+        C2[TensorFlow LSTM Inference]
+        C3[Heuristic Wake-Gesture Filter]
+    end
+
+    A1 <-->|UDP Stream port 5052| B2
+    A2 <-->|DOM Canvas / WebSockets| B2
+    B1 --> C1
+    C1 --> C3
+    C3 -->|If Hand Open > 2s| C2
+    C2 --> B2
     
-    classDef blue fill:#2a4365,stroke:#63b3ed,stroke-width:2px,color:#fff
-    classDef green fill:#22543d,stroke:#68d391,stroke-width:2px,color:#fff
-    classDef purple fill:#44337a,stroke:#b794f4,stroke-width:2px,color:#fff
+    classDef ui fill:#2c5282,stroke:#63b3ed,stroke-width:2px,color:#fff
+    classDef edge fill:#276749,stroke:#68d391,stroke-width:2px,color:#fff
+    classDef ai fill:#553c9a,stroke:#b794f4,stroke-width:2px,color:#fff
     
-    class A,B blue
-    class C,D,E,F purple
-    class G,H green
+    class A1,A2 ui
+    class B1,B2 edge
+    class C1,C2,C3 ai
+```
+
+---
+
+## 🌊 Data Flow Pipeline
+
+The transformation of raw pixel data into physical 3D text follows a strict, highly optimized 5-stage pipeline:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as User
+    participant C as Camera
+    participant MP as MediaPipe
+    participant N as Normalizer
+    participant AI as LSTM / Heuristics
+    participant AR as AR Renderer
+
+    U->>C: Performs physical ISL Sign
+    C->>MP: Raw RGB Video Stream (30 FPS)
+    MP->>N: 543 Raw 3D Coordinates
+    N->>AI: Normalized Spatiotemporal Vectors
+    
+    alt If Standby Mode
+        AI-->>N: Fails Wake-Gesture Threshold (System Sleeps)
+    else If Active Inference
+        AI->>AR: Predicted ISL Gloss (e.g., "Hello")
+        AR->>AR: Raycast to physical 3D plane
+        AR->>U: Anchors Floating Text next to speaker
+    end
 ```
 
 1. **📷 Standby Mode (Heuristic Wake-Gesture)**
