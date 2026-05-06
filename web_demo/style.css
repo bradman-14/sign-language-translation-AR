@@ -327,6 +327,44 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); over
 .footer-copy { font-size: 13px; color: var(--muted); }
 .footer-tech { margin-left: auto; font-size: 12px; color: var(--muted); font-family: var(--mono); }
 
+/* ── Guide Banner ── */
+.guide-banner {
+  display: flex; align-items: flex-start; gap: 16px;
+  background: linear-gradient(135deg, rgba(0,212,170,0.1), rgba(108,99,255,0.1));
+  border: 1px solid rgba(0,212,170,0.3); border-radius: var(--radius);
+  padding: 18px 20px; margin-bottom: 28px;
+}
+.guide-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+.guide-body { flex: 1; font-size: 14px; line-height: 1.6; }
+.guide-body strong { display: block; color: var(--accent2); margin-bottom: 4px; font-size: 15px; }
+.guide-body em { color: var(--accent2); font-style: normal; font-weight: 600; }
+.guide-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 0 4px; flex-shrink: 0; }
+.guide-close:hover { color: var(--text); }
+
+/* ── Primary Panel (Simulation) ── */
+.primary-panel {
+  border-color: rgba(0,212,170,0.35) !important;
+  background: linear-gradient(135deg, rgba(0,212,170,0.06), rgba(108,99,255,0.06)) !important;
+}
+.panel-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.panel-title-row .panel-title { margin-bottom: 0; }
+.recommended-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  background: rgba(0,212,170,0.2); color: var(--accent2);
+  border: 1px solid rgba(0,212,170,0.4); padding: 3px 8px; border-radius: 6px;
+}
+
+/* ── Code Snippet ── */
+.code-snippet {
+  background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px;
+  font-family: var(--mono); font-size: 12px; color: var(--accent2);
+  line-height: 1.8; margin-bottom: 4px;
+}
+
+/* ── Connection Error Note ── */
+.conn-note { font-size: 12px; color: var(--accent3); margin-top: 8px; min-height: 16px; line-height: 1.5; }
+
 /* ── Responsive ── */
 @media (max-width: 1200px) {
   .demo-layout { grid-template-columns: 240px 1fr; }

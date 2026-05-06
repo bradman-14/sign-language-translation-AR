@@ -110,7 +110,12 @@ function connectWS() {
       btnConnect.disabled = false;
       btnDisconn.disabled = true;
     };
-    ws.onerror = () => addLog('WebSocket connection failed.', 'error');
+    ws.onerror = () => {
+      const note = $('conn-note');
+      if (note) note.textContent = '⚠ Backend not reachable. Is inference.py running? Use Simulation Mode for demo.';
+      addLog('⚠ Connection failed — inference.py not running. Use ▶ Start Simulation instead.', 'error');
+      btnConnect.disabled = false;
+    };
   } catch(err) { addLog('Invalid URL: ' + err.message, 'error'); }
 }
 
