@@ -1,19 +1,51 @@
 # Bridging the Communication Divide: Real-Time ISL Translation System with AR
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-lightgrey)
+![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Android%20%7C%20iOS-lightgrey)
 ![Framework](https://img.shields.io/badge/Framework-MediaPipe%20%7C%20TensorFlow%20%7C%20Unity-orange)
 
 ## 📌 Project Overview
 This project presents a novel, hands-free Augmented Reality (AR) translation system for Indian Sign Language (ISL). By shifting the translation interface into a depth-aware AR environment, the system allows Deaf and Hard-of-Hearing (DHH) individuals to maintain natural eye contact during communication, entirely removing the split-attention effect caused by traditional 2D mobile applications.
 
-The pipeline captures 543 spatiotemporal landmarks (manual and non-manual facial markers) using the **MediaPipe Holistic** framework, processes them through an optimized **Long Short-Term Memory (LSTM)** network with a 30-frame context window, and dynamically anchors the translated text in 3D space near the speaker using **Unity AR Foundation**.
+The pipeline captures 543 spatiotemporal landmarks using the **MediaPipe Holistic** framework, classifies gestures through mathematically invariant heuristics and **LSTM networks**, and dynamically anchors the translated text in 3D space near the speaker using **Unity AR Foundation** and **Web AR**.
 
-### 🔥 Key Features
-- **Holistic Tracking:** Simultaneously tracks body pose, dense 468-point facial mesh, and 21-point hand knuckles.
-- **Robust Sequence Modeling:** Utilizes LSTMs to recognize continuous ISL sequences via a sliding window (166 ms latency).
-- **Wake-Gesture Optimization:** Mitigates thermal throttling by implementing a heuristic mathematical standby mode. Deep learning only triggers upon a 2-second specific hand geometry threshold.
-- **Contextual AR UI:** Translated text is mapped from 2D coordinates to 3D physical depth vectors, anchoring naturally in the user's field of view.
+---
+
+## 🏗️ System Architecture & Dataflow
+
+Our system operates on a highly optimized, 5-stage edge-computing pipeline designed to run on consumer hardware without thermal throttling:
+
+1. **📷 Standby Mode (Heuristic Wake-Gesture)**
+   The camera feed initializes but the heavy AI stays asleep. A lightweight Euclidean heuristic scans the video feed. To activate the system, the user must hold an **Open Hand** steady for 2 seconds. This prevents battery drain during normal conversation pauses.
+2. **🦴 Spatiotemporal Extraction (MediaPipe)**
+   Once awake, MediaPipe extracts exactly 543 3D landmarks (33 pose, 468 face, 21+21 hand nodes).
+3. **📐 Normalization Phase**
+   Coordinates are translated relative to the **Nose landmark (Node 0)** and scaled uniformly based on the Euclidean distance between the shoulders, ensuring scale and translation invariance.
+4. **🧠 Inference Engine (Classification/LSTM)**
+   The normalized coordinates are passed through either our client-side heuristic engine or the Python LSTM model. Gestures are classified using wrist-to-fingertip distance algorithms to ensure accurate detection regardless of hand rotation.
+5. **🔮 AR Anchoring (Unity / Web Canvas)**
+   The recognized translation text is mapped from 2D coordinates to 3D physical depth vectors. Unity AR Foundation raycasts this data to anchor the text physically beside the speaker, maintaining eye contact.
+
+---
+
+## ✋ Supported Gestures & Hand Positions
+
+The system currently tracks a vocabulary of distinct, contextually vital ISL/ASL signs. **Before performing any sign, you must wake the system by holding an Open Hand for 2 seconds.**
+
+| Translation Target | The Physical Hand Position Required |
+| :--- | :--- |
+| **Hello 👋** | **Open Hand:** All 5 fingers extended and spread out. |
+| **Thank You 🙏** | **Thumbs Up:** Only the thumb extended, all other fingers tightly curled. |
+| **I Love You 🤟** | **Official ILY Sign:** Extend your thumb, index finger, and pinky finger. Keep middle and ring fingers closed. |
+| **Peace ✌️** | **Peace Sign:** Index and middle fingers extended in a V-shape, others closed. |
+| **Yes ✅** | **Point Up:** Only the index finger extended straight up. |
+| **No ❌** | **Closed Fist:** All fingers and thumb tightly curled in. |
+| **Toilet 🚽** | **Pinky Only:** Extend *only* your pinky finger. (Universal sign for bathroom/emergency). |
+| **Call Me 📞** | **Phone Hand:** Extend your thumb and pinky finger out, middle three fingers closed. |
+| **Perfect 👌** | **OK Sign:** Pinch thumb and index finger together, keeping middle, ring, and pinky extended. |
+| **Please 🤲** | **Pinch:** Pinch your thumb and index finger together, keeping all other fingers closed. |
+| **Water 💧** | **Three Fingers:** Index, middle, and ring fingers extended. |
+| **Help 🆘** | **Four Fingers:** All four fingers extended, but thumb tucked into the palm. |
 
 ---
 
@@ -21,81 +53,41 @@ The pipeline captures 543 spatiotemporal landmarks (manual and non-manual facial
 
 ```text
 ISL-AR-Translation/
-├── ai_model/
-│   ├── models/                # Saved LSTM weights & architecture
-│   ├── src/
-│   │   ├── data_extraction.py # MediaPipe Holistic processing & normalization
-│   │   ├── model.py           # TensorFlow/Keras LSTM model definition
-│   │   ├── train.py           # Training pipeline for INCLUDE dataset logic
-│   │   └── inference.py       # Live stream translation with Wake-Gesture logic
-│   └── requirements.txt       # Python dependencies
-├── unity_ar_app/
-│   └── Assets/
-│       └── Scripts/
-│           ├── ARTextPlacer.cs # Unity AR Foundation raycasting script
-│           └── UDPReceiver.cs  # Local networking script for AI-to-Unity bridging
-└── README.md
+├── web_demo/                  # 🌐 FULL PRESENTATION UI (Recommended)
+│   ├── index.html             # Dashboard with Architecture, Metrics, and AR UI
+│   ├── app.js                 # UI Logic and Simulation Engine
+│   ├── camera.js              # 100% Browser-based MediaPipe tracking & classification
+│   └── style.css              # Custom CSS styling
+├── ai_model/                  # 🐍 PYTHON BACKEND (Optional/Training)
+│   ├── models/                # Saved LSTM weights
+│   └── src/
+│       ├── data_extraction.py # MediaPipe extraction & normalization
+│       ├── model.py           # TensorFlow/Keras LSTM model
+│       ├── train.py           # Training pipeline
+│       └── inference.py       # Live stream translation
+├── unity_ar_app/              # 📱 UNITY MOBILE DEPLOYMENT
+│   └── Assets/Scripts/
+│       ├── ARTextPlacer.cs    # Unity AR Foundation raycasting
+│       └── UDPReceiver.cs     # Local networking for AI bridging
+└── serve_demo.py              # Local Web Server Launcher
 ```
 
 ---
 
-## 🛠️ Setup Instructions
+## 🚀 How to Run the Presentation Demo
 
-### 1. AI Model Setup (Python Pipeline)
+The easiest way to present the project with full Web AR functionality (bypassing any Python/Mac compatibility bugs):
 
-1. Navigate to the model directory:
+1. **Launch the Server:**
    ```bash
-   cd ai_model
+   python3 serve_demo.py
    ```
-2. Create a virtual environment and install dependencies:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
-3. Data Extraction (Example):
-   To process videos into numpy coordinate arrays (you will need to download the INCLUDE dataset):
-   ```bash
-   python src/data_extraction.py --dataset_path /path/to/dataset
-   ```
-4. Train the Model:
-   ```bash
-   python src/train.py
-   ```
-5. Run Real-Time Inference:
-   This will open your webcam, run the Wake-Gesture heuristic, and send predictions via UDP port 5052.
-   ```bash
-   python src/inference.py
-   ```
-
-### 2. AR Application Setup (Unity3D)
-
-1. Install **Unity Hub** and a compatible Unity version (e.g., 2022.3 LTS).
-2. Create a new 3D AR project using the **AR Foundation** template.
-3. Replace your `Assets/Scripts/` with the provided scripts in this repository.
-4. Attach `ARTextPlacer.cs` and `UDPReceiver.cs` to your main AR Camera or an Empty GameObject.
-5. In your Unity UI, assign a 3D TextMeshPro object to the script inspector.
-6. Build and Run on your iOS (ARKit) or Android (ARCore) device. Ensure both your PC and mobile device are on the same local network for UDP communication if testing locally.
-
----
-
-## 🧠 Methodology Deep-Dive
-
-### 1. Coordinate Normalization
-To ensure scale and translation invariance, MediaPipe coordinates aren't boxed dynamically. All joint coordinates are translated relative to the **Nose landmark (Node 0)** and scaled uniformly based on the Euclidean distance between the left and right shoulders.
-
-### 2. Wake-Gesture Math
-Before heavy inference runs, the script checks the Euclidean distance between specific landmarks (e.g., Wrist Node 0 and Index Fingertip Node 8). If the geometry holds for >2 seconds (e.g., raised hand state), the LSTM activates.
-
-### 3. AR Spatial Projection
-MediaPipe provides normalized 2D coordinates `(x, y) ∈ [0,1]`. By casting a ray from the AR Camera towards the generated physical point cloud, the system translates these bounds into accurate `(X, Y, Z)` world-space coordinates, anchoring the UI to the speaker's shoulder.
-
----
-
-## 📊 Evaluation Framework
-- **Machine Learning Metrics:** Evaluated primarily on **F1-Scores** to account for gesture frequency imbalances in the INCLUDE dataset.
-- **Hardware Profile:** Targets `<200 ms` end-to-end latency and continuous `30 FPS` on standard smartphone SoCs.
-- **UX Metrics:** Measured using System Usability Scale (SUS) and Gaze Retention Time to prove the efficacy of the AR "magic window."
+2. **Open the Dashboard:**
+   Navigate to `http://localhost:8080` in your web browser.
+3. **Presenting:**
+   - Scroll to the **Live Translation Console**.
+   - Click **▶ Start Simulation** to demonstrate the AR UI flow without a camera.
+   - Click **📷 Start Camera** to use the fully client-side MediaPipe engine and demonstrate live tracking with the gestures listed above.
 
 ---
 
@@ -105,10 +97,10 @@ MediaPipe provides normalized 2D coordinates `(x, y) ∈ [0,1]`. By casting a ra
 - A **Hybrid Cloud-Edge architecture** to dynamically load regional ISL dialects on demand.
 
 ## 👥 Contributors
-- Bhuvan Agarwal
-- Ishan Gupta
-- Khushi Nawal
-- Kr. Aadarsh Suman
+- Bhuvan Agarwal (1MS23CI024)
+- Ishan Gupta (1MS23CI043)
+- Khushi Nawal (1MS23CI057)
+- Kr. Aadarsh Suman (1MS23CI059)
 *(Ramaiah Institute of Technology)*
 
 **Subject:** CIE644 - Augmented and Virtual Reality  
