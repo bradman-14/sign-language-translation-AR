@@ -20,12 +20,16 @@ let frameCount       = 0;
 const GESTURE_MAP = {
   'open_hand':    { label: 'Hello 👋',       confidence: 0.94 },
   'thumbs_up':    { label: 'Thank You 🙏',   confidence: 0.91 },
-  'peace':        { label: 'I Love You ❤️',   confidence: 0.89 },
+  'peace':        { label: 'Peace ✌️',       confidence: 0.89 },
   'point_up':     { label: 'Yes ✅',          confidence: 0.92 },
   'fist':         { label: 'No ❌',           confidence: 0.88 },
   'pinch':        { label: 'Please 🤲',       confidence: 0.86 },
   'three_fingers': { label: 'Water 💧',       confidence: 0.85 },
   'four_fingers':  { label: 'Help 🆘',        confidence: 0.87 },
+  'pinky_only':    { label: 'Toilet 🚽',      confidence: 0.89 },
+  'call_me':       { label: 'Call Me 📞',     confidence: 0.90 },
+  'ok_sign':       { label: 'Perfect 👌',     confidence: 0.93 },
+  'ily_sign':      { label: 'I Love You 🤟',  confidence: 0.95 },
 };
 
 // ── Initialise MediaPipe Holistic ─────────────────
@@ -278,51 +282,47 @@ function onHolisticResults(results, canvasEl, ctx) {
 
 // ── Gesture Classification ────────────────────────
 function classifyGesture(landmarks) {
-  // Finger tip and PIP (proximal) indices
-  // Thumb:  tip=4, ip=3, mcp=2
-  // Index:  tip=8, pip=6
-  // Middle: tip=12, pip=10
-  // Ring:   tip=16, pip=14
-  // Pinky:  tip=20, pip=18
+  const wrist = landmarks[0];
+  const getDist = (p1, p2) => Math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2);
 
-  const tips = [4, 8, 12, 16, 20];
-  const pips = [2, 6, 10, 14, 18];
-
-  // Check which fingers are extended
-  const fingers = [];
-
-  // Thumb — compare x (for right hand, tip.x > ip.x means extended)
-  // Use distance from wrist for more reliability
+  // Thumb
   const thumbTip = landmarks[4];
-  const thumbIP  = landmarks[3];
   const thumbMCP = landmarks[2];
-  const wrist    = landmarks[0];
+  const thumbDist = getDist(wrist, thumbTip);
+  const thumbRef  = getDist(wrist, thumbMCP);
+  const isThumbExtended = thumbDist > thumbRef * 1.4;
 
-  const thumbDist = Math.sqrt((thumbTip.x - wrist.x)**2 + (thumbTip.y - wrist.y)**2);
-  const thumbRef  = Math.sqrt((thumbMCP.x - wrist.x)**2 + (thumbMCP.y - wrist.y)**2);
-  fingers.push(thumbDist > thumbRef * 1.3);
+  // Other fingers: tip vs pip distance to wrist
+  const tips = [8, 12, 16, 20];
+  const pips = [6, 10, 14, 18];
+  const fingers = [isThumbExtended];
 
-  // Other fingers — tip.y < pip.y means extended (screen coords, y goes down)
-  for (let i = 1; i < 5; i++) {
-    const tip = landmarks[tips[i]];
-    const pip = landmarks[pips[i]];
-    fingers.push(tip.y < pip.y);
+  for (let i = 0; i < 4; i++) {
+    const tipDist = getDist(wrist, landmarks[tips[i]]);
+    const pipDist = getDist(wrist, landmarks[pips[i]]);
+    // If tip is further from wrist than pip, it's extended
+    fingers.push(tipDist > pipDist * 1.2);
   }
 
   const [thumb, index, middle, ring, pinky] = fingers;
   const extendedCount = fingers.filter(f => f).length;
 
-  // Classification rules
-  if (extendedCount === 5) return 'open_hand';               // All fingers out = Hello
-  if (thumb && !index && !middle && !ring && !pinky) return 'thumbs_up';  // Thumbs up
-  if (!thumb && index && middle && !ring && !pinky) return 'peace';       // Peace = I Love You
-  if (!thumb && index && !middle && !ring && !pinky) return 'point_up';   // Point up = Yes
-  if (extendedCount === 0) return 'fist';                     // Fist = No
-  if (!thumb && index && middle && ring && !pinky) return 'three_fingers'; // 3 fingers = Water
-  if (!thumb && index && middle && ring && pinky) return 'four_fingers';   // 4 fingers = Help
-  // Pinch — thumb and index close together
-  const pinchDist = Math.sqrt((thumbTip.x - landmarks[8].x)**2 + (thumbTip.y - landmarks[8].y)**2);
+  // Pinch check
+  const pinchDist = getDist(thumbTip, landmarks[8]);
+
+  // Classification rules (more forgiving)
+  if (pinchDist < 0.05 && middle && ring && pinky) return 'ok_sign';      // Perfect
   if (pinchDist < 0.05 && !middle && !ring && !pinky) return 'pinch';     // Pinch = Please
+  if (extendedCount === 5) return 'open_hand';                            // Hello
+  if (extendedCount === 0) return 'fist';                                 // No
+  if (thumb && !index && !middle && !ring && !pinky) return 'thumbs_up';  // Thank You
+  if (!thumb && index && middle && !ring && !pinky) return 'peace';       // Peace
+  if (!thumb && index && !middle && !ring && !pinky) return 'point_up';   // Yes
+  if (!thumb && index && middle && ring && !pinky) return 'three_fingers';// Water
+  if (!thumb && index && middle && ring && pinky) return 'four_fingers';  // Help
+  if (!thumb && !index && !middle && !ring && pinky) return 'pinky_only'; // Toilet
+  if (thumb && !index && !middle && !ring && pinky) return 'call_me';     // Call Me
+  if (thumb && index && !middle && !ring && pinky) return 'ily_sign';     // I Love You
 
   return null;
 }

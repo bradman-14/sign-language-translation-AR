@@ -8,18 +8,19 @@
 const GESTURES = [
   { label: 'Hello',        emoji: '👋' },
   { label: 'Thank You',   emoji: '🙏' },
-  { label: 'I Love You',  emoji: '❤️' },
+  { label: 'I Love You',  emoji: '🤟' },
+  { label: 'Peace',        emoji: '✌️' },
   { label: 'Yes',          emoji: '✅' },
   { label: 'No',           emoji: '❌' },
   { label: 'Please',       emoji: '🤲' },
   { label: 'Help',         emoji: '🆘' },
-  { label: 'Good Morning', emoji: '🌅' },
-  { label: 'Sorry',        emoji: '😔' },
+  { label: 'Toilet',       emoji: '🚽' },
+  { label: 'Call Me',      emoji: '📞' },
+  { label: 'Perfect',      emoji: '👌' },
   { label: 'Water',        emoji: '💧' },
 ];
 
 // ── State ─────────────────────────────────────────────────────────
-let ws = null;
 let simInterval = null;
 let sessionStart = null;
 let totalPredictions = 0;
@@ -31,10 +32,6 @@ let wakeTimer = null;
 
 // ── DOM refs ──────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
-const wsDot       = $('ws-dot');
-const wsLabel     = $('ws-label');
-const btnConnect  = $('btn-connect');
-const btnDisconn  = $('btn-disconnect');
 const btnSim      = $('btn-simulate');
 const btnStopSim  = $('btn-stop-sim');
 const logStream   = $('log-stream');
@@ -59,9 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
   drawGaugeArc(null);
   initSmoothScroll();
   initNavHighlight();
-
-  btnConnect.addEventListener('click', connectWS);
-  btnDisconn.addEventListener('click', disconnectWS);
   btnSim.addEventListener('click', startSimulation);
   btnStopSim.addEventListener('click', stopSimulation);
   $('btn-clear-log').addEventListener('click', clearLog);
@@ -81,52 +75,7 @@ function buildGestureGrid() {
   });
 }
 
-// ── WebSocket ─────────────────────────────────────────────────────
-function connectWS() {
-  const url = $('ws-url').value.trim();
-  if (!url) return;
-  try {
-    ws = new WebSocket(url);
-    ws.onopen = () => {
-      setWSStatus(true);
-      addLog('Connected to backend: ' + url, 'system');
-      btnConnect.disabled = true;
-      btnDisconn.disabled = false;
-    };
-    ws.onmessage = e => {
-      try {
-        const data = JSON.parse(e.data);
-        if (data.event === 'prediction') {
-          handlePrediction(data.text, data.confidence);
-        } else if (data.event === 'wake') {
-          triggerWakeAnimation();
-          addLog('Wake gesture detected → LSTM activated', 'system');
-        }
-      } catch { addLog('Malformed message: ' + e.data, 'error'); }
-    };
-    ws.onclose = () => {
-      setWSStatus(false);
-      addLog('Connection closed.', 'system');
-      btnConnect.disabled = false;
-      btnDisconn.disabled = true;
-    };
-    ws.onerror = () => {
-      const note = $('conn-note');
-      if (note) note.textContent = '⚠ Backend not reachable. Is inference.py running? Use Simulation Mode for demo.';
-      addLog('⚠ Connection failed — inference.py not running. Use ▶ Start Simulation instead.', 'error');
-      btnConnect.disabled = false;
-    };
-  } catch(err) { addLog('Invalid URL: ' + err.message, 'error'); }
-}
 
-function disconnectWS() {
-  if (ws) { ws.close(); ws = null; }
-}
-
-function setWSStatus(connected) {
-  wsDot.className = 'status-dot' + (connected ? ' connected' : '');
-  wsLabel.textContent = connected ? 'Live' : 'Disconnected';
-}
 
 // ── Simulation ────────────────────────────────────────────────────
 function startSimulation() {

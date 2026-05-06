@@ -29,9 +29,6 @@
       <a href="#metrics"      class="nav-link"        data-section="metrics">Metrics</a>
       <a href="#team"         class="nav-link"        data-section="team">Team</a>
     </div>
-    <div class="nav-status">
-      <span class="status-dot" id="ws-dot"></span>
-      <span class="status-label" id="ws-label">Disconnected</span>
     </div>
   </nav>
 
@@ -225,17 +222,7 @@
           <button id="btn-stop-camera" class="btn btn-outline" style="width:100%;margin-top:8px" onclick="window.stopCamera()" disabled>Stop Camera</button>
         </div>
 
-        <!-- LIVE BACKEND — Optional, requires Python running -->
-        <div class="panel-card">
-          <h3 class="panel-title">⚡ Live Backend (Optional)</h3>
-          <p class="panel-desc">Requires real webcam inference. Run this command first in a terminal:</p>
-          <div class="code-snippet">cd ai_model/src<br/>python3 inference.py</div>
-          <label class="input-label" style="margin-top:10px">WebSocket URL</label>
-          <input id="ws-url" class="input-field" type="text" value="ws://localhost:8765" />
-          <button id="btn-connect" class="btn btn-primary" style="width:100%">Connect to Backend</button>
-          <button id="btn-disconnect" class="btn btn-outline" style="width:100%;margin-top:8px" disabled>Disconnect</button>
-          <p class="conn-note" id="conn-note"></p>
-        </div>
+
 
         <div class="panel-card">
           <h3 class="panel-title">ISL Gesture Reference</h3>
