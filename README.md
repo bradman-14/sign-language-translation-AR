@@ -4,16 +4,16 @@
 ![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Android%20%7C%20iOS-lightgrey)
 ![Framework](https://img.shields.io/badge/Framework-MediaPipe%20%7C%20TensorFlow%20%7C%20Unity-orange)
 
-## 📌 Project Overview
+##  Project Overview
 This project presents a novel, hands-free Augmented Reality (AR) translation system for Indian Sign Language (ISL). By shifting the translation interface into a depth-aware AR environment, the system allows Deaf and Hard-of-Hearing (DHH) individuals to maintain natural eye contact during communication, entirely removing the split-attention effect caused by traditional 2D mobile applications.
 
 The pipeline captures 543 spatiotemporal landmarks using the **MediaPipe Holistic** framework, classifies gestures through mathematically invariant heuristics and **LSTM networks**, and dynamically anchors the translated text in 3D space near the speaker using **Unity AR Foundation** and **Web AR**.
 
 ---
 
-## 💻 Technology Stack
+##  Technology Stack
 
-### 🧠 Artificial Intelligence & Computer Vision
+###  Artificial Intelligence & Computer Vision
 - **MediaPipe Holistic:** 543-point real-time spatiotemporal landmark extraction.
 - **TensorFlow & Keras:** Building, training, and running the LSTM sequential model.
 - **NumPy & OpenCV:** Matrix manipulations, normalization math, and computer vision.
@@ -29,7 +29,7 @@ The pipeline captures 543 spatiotemporal landmarks using the **MediaPipe Holisti
 
 ---
 
-## 🏗️ System Architecture
+##  System Architecture
 
 Our project is structured across three distinct computational layers running entirely on the edge device to ensure zero-latency communication without requiring cloud processing.
 
@@ -97,15 +97,15 @@ sequenceDiagram
     end
 ```
 
-1. **📷 Standby Mode (Heuristic Wake-Gesture)**
+1. ** Standby Mode (Heuristic Wake-Gesture)**
    The camera feed initializes but the heavy AI stays asleep. A lightweight Euclidean heuristic scans the video feed. To activate the system, the user must hold an **Open Hand** steady for 2 seconds. This prevents battery drain during normal conversation pauses.
-2. **🦴 Spatiotemporal Extraction (MediaPipe)**
+2. ** Spatiotemporal Extraction (MediaPipe)**
    Once awake, MediaPipe extracts exactly 543 3D landmarks (33 pose, 468 face, 21+21 hand nodes).
-3. **📐 Normalization Phase**
+3. ** Normalization Phase**
    Coordinates are translated relative to the **Nose landmark (Node 0)** and scaled uniformly based on the Euclidean distance between the shoulders, ensuring scale and translation invariance.
-4. **🧠 Inference Engine (Classification/LSTM)**
+4. ** Inference Engine (Classification/LSTM)**
    The normalized coordinates are passed through either our client-side heuristic engine or the Python LSTM model. Gestures are classified using wrist-to-fingertip distance algorithms to ensure accurate detection regardless of hand rotation.
-5. **🔮 AR Anchoring (Unity / Web Canvas)**
+5. ** AR Anchoring (Unity / Web Canvas)**
    The recognized translation text is mapped from 2D coordinates to 3D physical depth vectors. Unity AR Foundation raycasts this data to anchor the text physically beside the speaker, maintaining eye contact.
 
 ---
@@ -135,19 +135,19 @@ The system currently tracks a vocabulary of distinct, contextually vital ISL/ASL
 
 ```text
 ISL-AR-Translation/
-├── web_demo/                  # 🌐 FULL PRESENTATION UI (Recommended)
+├── web_demo/                  #  FULL PRESENTATION UI 
 │   ├── index.html             # Dashboard with Architecture, Metrics, and AR UI
 │   ├── app.js                 # UI Logic and Simulation Engine
 │   ├── camera.js              # 100% Browser-based MediaPipe tracking & classification
 │   └── style.css              # Custom CSS styling
-├── ai_model/                  # 🐍 PYTHON BACKEND (Optional/Training)
+├── ai_model/                  # PYTHON BACKEND (Optional/Training)
 │   ├── models/                # Saved LSTM weights
 │   └── src/
 │       ├── data_extraction.py # MediaPipe extraction & normalization
 │       ├── model.py           # TensorFlow/Keras LSTM model
 │       ├── train.py           # Training pipeline
 │       └── inference.py       # Live stream translation
-├── unity_ar_app/              # 📱 UNITY MOBILE DEPLOYMENT
+├── unity_ar_app/              # UNITY MOBILE DEPLOYMENT
 │   └── Assets/Scripts/
 │       ├── ARTextPlacer.cs    # Unity AR Foundation raycasting
 │       └── UDPReceiver.cs     # Local networking for AI bridging
@@ -179,11 +179,10 @@ The easiest way to present the project with full Web AR functionality (bypassing
 - A **Hybrid Cloud-Edge architecture** to dynamically load regional ISL dialects on demand.
 
 ## 👥 Contributors
-- Bhuvan Agarwal (1MS23CI024)
+- Bhuvan Agrawal (1MS23CI024)
 - Ishan Gupta (1MS23CI043)
 - Khushi Nawal (1MS23CI057)
 - Kr. Aadarsh Suman (1MS23CI059)
-*(Ramaiah Institute of Technology)*
 
 **Subject:** CIE644 - Augmented and Virtual Reality  
-**Evaluation Term:** Feb 2026 – June 2026
+
