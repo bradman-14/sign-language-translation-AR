@@ -1,74 +1,131 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using TMPro;
 
+/// <summary>
+/// ARTextPlacer — Anchors translated ISL text in 3D world space adjacent
+/// to the detected speaker using AR Foundation raycasting + depth sensing.
+/// 
+/// Setup:
+///   1. Attach this script to your AR Session Origin or an empty GameObject.
+///   2. Assign the ARRaycastManager from the AR Session Origin in the Inspector.
+///   3. Assign a prefab that has a TextMeshPro component to the textPrefab field.
+///   4. UDPReceiver calls UpdateTranslation() with prediction strings.
+/// </summary>
 public class ARTextPlacer : MonoBehaviour
 {
     [Header("AR Components")]
     public ARRaycastManager raycastManager;
     public ARCameraManager cameraManager;
-    
-    [Header("UI Prefab")]
-    public GameObject textPrefab;
-    private GameObject activeTextInstance;
-    private TextMeshPro textComponent;
 
-    // Projected coordinates from MediaPipe (Normalized 0.0 - 1.0)
-    // We default to the center slightly offset.
-    private Vector2 targetViewportPos = new Vector2(0.5f, 0.4f);
+    [Header("Text Prefab (must have TextMeshPro component)")]
+    public GameObject textPrefab;
+
+    [Header("Placement Settings")]
+    [Tooltip("Position in normalized viewport space (0-1) where AR text appears.")]
+    public Vector2 targetViewportPos = new Vector2(0.5f, 0.38f);
+
+    [Tooltip("Lerp speed for smooth text repositioning.")]
+    public float lerpSpeed = 5f;
+
+    [Tooltip("How many seconds translated text stays visible before fading.")]
+    public float displayDuration = 4f;
+
+    // ── Internals ──────────────────────────────────────────────────────────────
+    private GameObject       activeTextInstance;
+    private TextMeshPro      textComponent;
+    private List<ARRaycastHit> hits = new List<ARRaycastHit>();
+    private float            lastUpdateTime = -999f;
+    private bool             isInitialized  = false;
 
     void Start()
     {
-        // Instantiate the text object but hide it initially
-        if (textPrefab != null)
+        if (textPrefab == null)
         {
-            activeTextInstance = Instantiate(textPrefab);
-            textComponent = activeTextInstance.GetComponent<TextMeshPro>();
-            activeTextInstance.SetActive(false);
+            Debug.LogWarning("[ARTextPlacer] textPrefab is not assigned. Text will not display.");
+            return;
         }
+
+        activeTextInstance = Instantiate(textPrefab);
+        textComponent      = activeTextInstance.GetComponent<TextMeshPro>();
+
+        if (textComponent == null)
+        {
+            Debug.LogError("[ARTextPlacer] textPrefab does not contain a TextMeshPro component.");
+            return;
+        }
+
+        activeTextInstance.SetActive(false);
+        isInitialized = true;
+        Debug.Log("[ARTextPlacer] Initialized successfully.");
     }
 
     void Update()
     {
-        // Continuously try to anchor text near the tracked subject
-        UpdateTextPosition();
-    }
+        if (!isInitialized) return;
 
-    public void UpdateTranslation(string translation)
-    {
-        if (textComponent != null)
+        // Auto-hide text after displayDuration seconds
+        if (activeTextInstance.activeSelf &&
+            Time.time - lastUpdateTime > displayDuration)
         {
-            textComponent.text = translation;
-            activeTextInstance.SetActive(true);
+            activeTextInstance.SetActive(false);
+        }
+
+        if (activeTextInstance.activeSelf)
+        {
+            UpdateTextPosition();
         }
     }
 
+    /// <summary>
+    /// Called by UDPReceiver (on main thread) to display a new translation.
+    /// </summary>
+    public void UpdateTranslation(string translation)
+    {
+        if (!isInitialized) return;
+        textComponent.text = translation;
+        activeTextInstance.SetActive(true);
+        lastUpdateTime = Time.time;
+    }
+
+    /// <summary>
+    /// Translates normalized MediaPipe 2D viewport coordinates to a 3D world
+    /// position using AR Foundation raycasting against the real-world point cloud.
+    /// </summary>
     private void UpdateTextPosition()
     {
-        if (!activeTextInstance.activeSelf) return;
+        if (raycastManager == null) return;
 
-        // Convert normalized viewport coordinates from MediaPipe to Screen Space
-        Vector2 screenPosition = new Vector2(
+        // Convert normalized [0,1] viewport coordinates → screen pixel coordinates
+        Vector2 screenPos = new Vector2(
             targetViewportPos.x * Screen.width,
             targetViewportPos.y * Screen.height
         );
 
-        List<ARRaycastHit> hits = new List<ARRaycastHit>();
-        
-        // Raycast against the real-world point cloud/planes
-        if (raycastManager.Raycast(screenPosition, hits, TrackableType.FeaturePoint | TrackableType.PlaneWithinPolygon))
+        hits.Clear();
+
+        // Raycast against feature points and detected planes
+        if (raycastManager.Raycast(screenPos, hits,
+            TrackableType.FeaturePoint | TrackableType.PlaneWithinPolygon))
         {
             Pose hitPose = hits[0].pose;
-            
-            // Anchor text to the 3D depth vector obtained via AR Foundation
-            activeTextInstance.transform.position = Vector3.Lerp(activeTextInstance.transform.position, hitPose.position, Time.deltaTime * 5f);
-            
-            // Ensure the text always faces the user's camera
-            Vector3 cameraPosition = Camera.main.transform.position;
-            activeTextInstance.transform.LookAt(cameraPosition);
-            activeTextInstance.transform.Rotate(0, 180, 0); // Correct text orientation
+
+            // Smoothly move text to the depth-resolved 3D world position
+            activeTextInstance.transform.position = Vector3.Lerp(
+                activeTextInstance.transform.position,
+                hitPose.position,
+                Time.deltaTime * lerpSpeed
+            );
+
+            // Billboard: text always faces the AR camera
+            if (Camera.main != null)
+            {
+                activeTextInstance.transform.LookAt(Camera.main.transform.position);
+                activeTextInstance.transform.Rotate(0f, 180f, 0f); // Flip to face camera
+            }
         }
     }
 }

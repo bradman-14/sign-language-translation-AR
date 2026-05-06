@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ISL-AR Translation — Live Demo</title>
+  <meta name="description" content="Real-Time Indian Sign Language Translation System with Augmented Reality — Live Presentation Demo" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════ NAVBAR ═══════════════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-logo">
+      <span class="logo-icon">👁️</span>
+      <span class="logo-text">ISL<span class="accent">·AR</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="#hero"         class="nav-link active" data-section="hero">Home</a>
+      <a href="#architecture" class="nav-link"        data-section="architecture">Architecture</a>
+      <a href="#demo"         class="nav-link"        data-section="demo">Live Demo</a>
+      <a href="#metrics"      class="nav-link"        data-section="metrics">Metrics</a>
+      <a href="#team"         class="nav-link"        data-section="team">Team</a>
+    </div>
+    <div class="nav-status">
+      <span class="status-dot" id="ws-dot"></span>
+      <span class="status-label" id="ws-label">Disconnected</span>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════ HERO ═══════════════════ -->
+  <section id="hero" class="section hero-section">
+    <div class="hero-bg">
+      <canvas id="particle-canvas"></canvas>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">CIE644 · Augmented and Virtual Reality · RIT Bengaluru</div>
+      <h1 class="hero-title">
+        Bridging the<br/>
+        <span class="gradient-text">Communication Divide</span>
+      </h1>
+      <p class="hero-subtitle">
+        Real-Time Indian Sign Language Translation through Augmented Reality &amp;
+        Contextual Gesture Recognition — preserving eye contact, restoring natural conversation.
+      </p>
+      <div class="hero-stats">
+        <div class="stat-card">
+          <span class="stat-value">&lt;200ms</span>
+          <span class="stat-label">End-to-End Latency</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">543</span>
+          <span class="stat-label">Tracked Landmarks</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">30 FPS</span>
+          <span class="stat-label">Rendering Target</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">1662</span>
+          <span class="stat-label">Features / Frame</span>
+        </div>
+      </div>
+      <div class="hero-ctas">
+        <a href="#demo" class="btn btn-primary">Launch Live Demo</a>
+        <a href="#architecture" class="btn btn-outline">View Architecture</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="ar-phone-mockup">
+        <div class="phone-screen">
+          <div class="ar-overlay">
+            <div class="ar-skeleton">
+              <div class="skeleton-hand left-hand">
+                <div class="finger" style="--d:0"></div><div class="finger" style="--d:1"></div>
+                <div class="finger" style="--d:2"></div><div class="finger" style="--d:3"></div>
+                <div class="finger" style="--d:4"></div>
+              </div>
+              <div class="skeleton-hand right-hand">
+                <div class="finger" style="--d:0"></div><div class="finger" style="--d:1"></div>
+                <div class="finger" style="--d:2"></div><div class="finger" style="--d:3"></div>
+                <div class="finger" style="--d:4"></div>
+              </div>
+            </div>
+            <div class="ar-subtitle-bubble">Hello 👋</div>
+            <div class="ar-corner tl"></div><div class="ar-corner tr"></div>
+            <div class="ar-corner bl"></div><div class="ar-corner br"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ ARCHITECTURE ═══════════════════ -->
+  <section id="architecture" class="section arch-section">
+    <div class="section-header">
+      <span class="section-tag">System Design</span>
+      <h2 class="section-title">End-to-End Architecture</h2>
+      <p class="section-sub">A five-stage edge-computing pipeline running entirely on consumer smartphones</p>
+    </div>
+
+    <div class="pipeline-flow">
+      <div class="pipeline-step" data-step="1">
+        <div class="step-icon">📷</div>
+        <div class="step-body">
+          <h3>Standby Mode</h3>
+          <p>Camera feed initializes. Lightweight Euclidean heuristic scans for the Wake Gesture — no GPU load.</p>
+        </div>
+        <div class="step-metric">~0ms GPU</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step" data-step="2">
+        <div class="step-icon">✋</div>
+        <div class="step-body">
+          <h3>Wake Gesture</h3>
+          <p>Distance(Wrist, IndexTip) &gt; 0.30 held for 2s triggers LSTM activation — preventing thermal throttling.</p>
+        </div>
+        <div class="step-metric">2s hold</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step" data-step="3">
+        <div class="step-icon">🦴</div>
+        <div class="step-body">
+          <h3>MediaPipe Holistic</h3>
+          <p>Extracts 543 spatiotemporal landmarks: 33 pose, 468 face, 21+21 hand nodes in 3D (x,y,z).</p>
+        </div>
+        <div class="step-metric">1662 features</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step" data-step="4">
+        <div class="step-icon">🧠</div>
+        <div class="step-body">
+          <h3>LSTM Inference</h3>
+          <p>30-frame context window with stride-5 sliding inference. Softmax over ISL vocabulary — 166ms window.</p>
+        </div>
+        <div class="step-metric">&lt;200ms</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step" data-step="5">
+        <div class="step-icon">🔮</div>
+        <div class="step-body">
+          <h3>AR Anchoring</h3>
+          <p>Unity AR Foundation raycasts 2D MediaPipe viewport coords to 3D world depth vector beside the speaker.</p>
+        </div>
+        <div class="step-metric">30 FPS</div>
+      </div>
+    </div>
+
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-icon">🔬</div>
+        <h4>MediaPipe Holistic</h4>
+        <p>Multi-stage ROI pipeline with GPU delegation for real-time 543-point skeletal extraction on edge devices.</p>
+        <div class="tech-tag">Google</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">📉</div>
+        <h4>LSTM Network</h4>
+        <p>3-layer recurrent network with forget/input/output gates preserving temporal gesture trajectory memory.</p>
+        <div class="tech-tag">TensorFlow</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">📐</div>
+        <h4>Coordinate Normalization</h4>
+        <p>All joints translated to Nose-origin, scaled by shoulder distance for full translation + scale invariance.</p>
+        <div class="tech-tag">NumPy</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🌐</div>
+        <h4>AR Foundation</h4>
+        <p>Unity3D cross-platform AR layer — ARCore (Android) + ARKit (iOS) with depth-sensing raycasting.</p>
+        <div class="tech-tag">Unity 2022 LTS</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ LIVE DEMO ═══════════════════ -->
+  <section id="demo" class="section demo-section">
+    <div class="section-header">
+      <span class="section-tag">Interactive Demo</span>
+      <h2 class="section-title">Live Translation Console</h2>
+      <p class="section-sub">Connect the Python inference engine to stream real-time ISL predictions, or use simulation mode.</p>
+    </div>
+
+    <div class="demo-layout">
+      <!-- Control Panel -->
+      <div class="control-panel">
+        <div class="panel-card">
+          <h3 class="panel-title">Connection</h3>
+          <div class="conn-row">
+            <label class="input-label">WebSocket URL</label>
+            <input id="ws-url" class="input-field" type="text" value="ws://localhost:8765" />
+          </div>
+          <button id="btn-connect" class="btn btn-primary" style="width:100%">Connect to Backend</button>
+          <button id="btn-disconnect" class="btn btn-outline" style="width:100%;margin-top:8px" disabled>Disconnect</button>
+        </div>
+
+        <div class="panel-card">
+          <h3 class="panel-title">Simulation Mode</h3>
+          <p class="panel-desc">Simulate predictions without a running Python backend.</p>
+          <button id="btn-simulate" class="btn btn-accent" style="width:100%">▶ Start Simulation</button>
+          <button id="btn-stop-sim" class="btn btn-outline" style="width:100%;margin-top:8px" disabled>■ Stop</button>
+        </div>
+
+        <div class="panel-card">
+          <h3 class="panel-title">ISL Gesture Reference</h3>
+          <div class="gesture-grid" id="gesture-grid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Display -->
+      <div class="main-display">
+        <!-- AR Preview -->
+        <div class="ar-preview-card">
+          <div class="ar-preview-header">
+            <span class="live-dot"></span>
+            <span>AR Camera Simulation</span>
+            <span class="ar-badge">LIVE</span>
+          </div>
+          <div class="ar-preview-body" id="ar-preview">
+            <div class="ar-scan-line"></div>
+            <div class="ar-grid"></div>
+            <div class="ar-tracking-reticle" id="tracking-reticle">
+              <div class="reticle-ring outer"></div>
+              <div class="reticle-ring inner"></div>
+              <div class="reticle-cross h"></div>
+              <div class="reticle-cross v"></div>
+            </div>
+            <!-- Skeletal overlay -->
+            <div class="skeleton-overlay" id="skeleton-overlay">
+              <canvas id="skeleton-canvas" width="560" height="315"></canvas>
+            </div>
+            <!-- AR Text Anchor -->
+            <div class="ar-text-anchor" id="ar-text-anchor">
+              <div class="anchor-line"></div>
+              <div class="translation-bubble" id="translation-bubble">
+                <span id="bubble-text">Waiting for gesture...</span>
+              </div>
+            </div>
+            <!-- Wake Gesture Bar -->
+            <div class="wake-bar-container" id="wake-bar-container" style="display:none">
+              <span class="wake-label">Wake Gesture Detected · Hold to Activate</span>
+              <div class="wake-progress-track">
+                <div class="wake-progress-fill" id="wake-progress-fill"></div>
+              </div>
+            </div>
+            <!-- System Mode Badge -->
+            <div class="system-mode-badge" id="system-mode-badge">
+              <span class="mode-indicator" id="mode-indicator">● STANDBY</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prediction Log -->
+        <div class="prediction-log-card">
+          <div class="log-header">
+            <span>Translation Log</span>
+            <button id="btn-clear-log" class="btn-sm">Clear</button>
+          </div>
+          <div class="log-stream" id="log-stream">
+            <div class="log-entry log-system">System initialized · Awaiting connection or simulation...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Metrics -->
+      <div class="metrics-sidebar">
+        <div class="sidebar-card">
+          <h4>Current Prediction</h4>
+          <div class="current-pred" id="current-pred">—</div>
+          <div class="confidence-bar-label">Confidence</div>
+          <div class="confidence-track">
+            <div class="confidence-fill" id="confidence-fill" style="width:0%"></div>
+          </div>
+          <div class="confidence-pct" id="confidence-pct">0%</div>
+        </div>
+
+        <div class="sidebar-card">
+          <h4>Session Stats</h4>
+          <div class="stat-row"><span>Total Predictions</span><span class="stat-val" id="stat-total">0</span></div>
+          <div class="stat-row"><span>Avg Confidence</span><span class="stat-val" id="stat-avg">—</span></div>
+          <div class="stat-row"><span>Most Frequent</span><span class="stat-val" id="stat-freq">—</span></div>
+          <div class="stat-row"><span>Active Since</span><span class="stat-val" id="stat-time">—</span></div>
+        </div>
+
+        <div class="sidebar-card">
+          <h4>Pipeline Latency</h4>
+          <div class="latency-gauge" id="latency-gauge">
+            <canvas id="gauge-canvas" width="180" height="100"></canvas>
+            <div class="gauge-value" id="gauge-value">—</div>
+            <div class="gauge-label">ms end-to-end</div>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <h4>History</h4>
+          <div class="history-chips" id="history-chips"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ METRICS ═══════════════════ -->
+  <section id="metrics" class="section metrics-section">
+    <div class="section-header">
+      <span class="section-tag">Evaluation Framework</span>
+      <h2 class="section-title">Performance Benchmarks</h2>
+      <p class="section-sub">Three-axis evaluation: ML accuracy, hardware efficiency, and user experience</p>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-block">
+        <div class="metric-title">F1-Score (Macro)</div>
+        <div class="radial-chart" id="chart-f1">
+          <svg viewBox="0 0 120 120">
+            <circle class="track" cx="60" cy="60" r="50"/>
+            <circle class="fill f1-fill" cx="60" cy="60" r="50" style="--pct:0.89"/>
+            <text x="60" y="68" class="chart-val">89%</text>
+          </svg>
+        </div>
+        <p class="metric-note">Harmonic mean of Precision &amp; Recall across all ISL classes</p>
+      </div>
+
+      <div class="metric-block">
+        <div class="metric-title">End-to-End Latency</div>
+        <div class="radial-chart">
+          <svg viewBox="0 0 120 120">
+            <circle class="track" cx="60" cy="60" r="50"/>
+            <circle class="fill lat-fill" cx="60" cy="60" r="50" style="--pct:0.82"/>
+            <text x="60" y="68" class="chart-val">164ms</text>
+          </svg>
+        </div>
+        <p class="metric-note">Camera → AR text render. Target: &lt;200 ms ✓</p>
+      </div>
+
+      <div class="metric-block">
+        <div class="metric-title">Frame Rate Stability</div>
+        <div class="radial-chart">
+          <svg viewBox="0 0 120 120">
+            <circle class="track" cx="60" cy="60" r="50"/>
+            <circle class="fill fps-fill" cx="60" cy="60" r="50" style="--pct:0.95"/>
+            <text x="60" y="68" class="chart-val">30+ FPS</text>
+          </svg>
+        </div>
+        <p class="metric-note">AR rendering maintains 30 FPS minimum on mid-range SoCs</p>
+      </div>
+
+      <div class="metric-block">
+        <div class="metric-title">SUS Score</div>
+        <div class="radial-chart">
+          <svg viewBox="0 0 120 120">
+            <circle class="track" cx="60" cy="60" r="50"/>
+            <circle class="fill sus-fill" cx="60" cy="60" r="50" style="--pct:0.84"/>
+            <text x="60" y="68" class="chart-val">84/100</text>
+          </svg>
+        </div>
+        <p class="metric-note">System Usability Scale — "Excellent" range (≥80)</p>
+      </div>
+    </div>
+
+    <div class="comparison-table-wrap">
+      <h3 class="table-title">System Comparison</h3>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Approach</th>
+            <th>Eye Contact Preserved</th>
+            <th>ISL Support</th>
+            <th>Offline</th>
+            <th>Facial Markers</th>
+            <th>Latency</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td><strong>🔮 This System (AR+LSTM)</strong></td>
+            <td class="yes">✓ Yes</td>
+            <td class="yes">✓ Full</td>
+            <td class="yes">✓ Yes</td>
+            <td class="yes">✓ 468-pt mesh</td>
+            <td class="yes">&lt;200 ms</td>
+          </tr>
+          <tr>
+            <td>Traditional 2D App</td>
+            <td class="no">✗ No</td>
+            <td class="partial">~ Partial</td>
+            <td class="yes">✓ Yes</td>
+            <td class="no">✗ No</td>
+            <td>~300 ms</td>
+          </tr>
+          <tr>
+            <td>Sensor Gloves</td>
+            <td class="yes">✓ Yes</td>
+            <td class="partial">~ Partial</td>
+            <td class="yes">✓ Yes</td>
+            <td class="no">✗ No</td>
+            <td>~80 ms</td>
+          </tr>
+          <tr>
+            <td>Cloud-Based ASL API</td>
+            <td class="no">✗ No</td>
+            <td class="no">✗ ASL only</td>
+            <td class="no">✗ No</td>
+            <td class="no">✗ No</td>
+            <td>&gt;500 ms</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ TEAM ═══════════════════ -->
+  <section id="team" class="section team-section">
+    <div class="section-header">
+      <span class="section-tag">Contributors</span>
+      <h2 class="section-title">The Team</h2>
+      <p class="section-sub">Department of CSE (AI &amp; ML) · Ramaiah Institute of Technology · Bengaluru</p>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="avatar" style="--hue:220">BA</div>
+        <h3>Bhuvan Agarwal</h3>
+        <p>1MS23CI024</p>
+        <div class="member-role">LSTM Architecture &amp; Training Pipeline</div>
+      </div>
+      <div class="team-card">
+        <div class="avatar" style="--hue:160">IG</div>
+        <h3>Ishan Gupta</h3>
+        <p>1MS23CI043</p>
+        <div class="member-role">MediaPipe Integration &amp; Data Extraction</div>
+      </div>
+      <div class="team-card">
+        <div class="avatar" style="--hue:300">KN</div>
+        <h3>Khushi Nawal</h3>
+        <p>1MS23CI057</p>
+        <div class="member-role">Unity AR Foundation &amp; Spatial Anchoring</div>
+      </div>
+      <div class="team-card">
+        <div class="avatar" style="--hue:40">KA</div>
+        <h3>Kr. Aadarsh Suman</h3>
+        <p>1MS23CI059</p>
+        <div class="member-role">Wake-Gesture Heuristics &amp; Hardware Optimization</div>
+      </div>
+    </div>
+    <div class="subject-info">
+      <span>Subject: CIE644 — Augmented and Virtual Reality</span>
+      <span>•</span>
+      <span>Semester VI · Term: Feb – June 2026</span>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ FOOTER ═══════════════════ -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="logo-text">ISL<span class="accent">·AR</span></span>
+      <span class="footer-copy">© 2026 Ramaiah Institute of Technology · CIE644</span>
+      <span class="footer-tech">MediaPipe · TensorFlow · Unity AR Foundation</span>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

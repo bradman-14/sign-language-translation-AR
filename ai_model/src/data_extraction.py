@@ -1,5 +1,8 @@
+# pyrefly: ignore [missing-import]
 import cv2
+# pyrefly: ignore [missing-import]
 import mediapipe as mp
+# pyrefly: ignore [missing-import]
 import numpy as np
 import os
 import math
