@@ -11,9 +11,47 @@ The pipeline captures 543 spatiotemporal landmarks using the **MediaPipe Holisti
 
 ---
 
+## 💻 Technology Stack
+
+### 🧠 Artificial Intelligence & Computer Vision
+- **MediaPipe Holistic:** 543-point real-time spatiotemporal landmark extraction.
+- **TensorFlow & Keras:** Building, training, and running the LSTM sequential model.
+- **NumPy & OpenCV:** Matrix manipulations, normalization math, and computer vision.
+- **Scikit-Learn:** Model evaluation and F1-metric generation.
+
+### 👓 Augmented Reality & Presentation UI
+- **Unity 3D (AR Foundation):** Mobile Augmented Reality deployment using ARCore (Android) and ARKit (iOS).
+- **Vanilla JS, HTML5, CSS3:** Zero-dependency presentation dashboard with Web AR canvas rendering.
+
+### 🌐 Networking & Edge Communication
+- **UDP Sockets:** Ultra-low latency data transfer between the Python edge backend and the Unity AR frontend.
+- **WebSockets:** Real-time bi-directional streaming for the browser dashboard.
+
+---
+
 ## 🏗️ System Architecture & Dataflow
 
 Our system operates on a highly optimized, 5-stage edge-computing pipeline designed to run on consumer hardware without thermal throttling:
+
+```mermaid
+graph TD
+    A[Camera Input] -->|Standby Mode| B{Wake Gesture Detected?}
+    B -- No --> A
+    B -- Yes: Open Hand for 2s --> C[MediaPipe Holistic]
+    C -->|Extract 543 Landmarks| D[Coordinate Normalization]
+    D -->|Nose Origin + Shoulder Scale| E[Inference Engine]
+    E -->|Wrist-to-Fingertip Distances| F[Classification / LSTM]
+    F -->|Translated ISL Gloss| G[AR Output Module]
+    G -->|Raycast to physical 3D Space| H[Unity AR / Web Canvas Display]
+    
+    classDef blue fill:#2a4365,stroke:#63b3ed,stroke-width:2px,color:#fff
+    classDef green fill:#22543d,stroke:#68d391,stroke-width:2px,color:#fff
+    classDef purple fill:#44337a,stroke:#b794f4,stroke-width:2px,color:#fff
+    
+    class A,B blue
+    class C,D,E,F purple
+    class G,H green
+```
 
 1. **📷 Standby Mode (Heuristic Wake-Gesture)**
    The camera feed initializes but the heavy AI stays asleep. A lightweight Euclidean heuristic scans the video feed. To activate the system, the user must hold an **Open Hand** steady for 2 seconds. This prevents battery drain during normal conversation pauses.
