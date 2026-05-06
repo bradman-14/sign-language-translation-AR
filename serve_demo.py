@@ -26,6 +26,7 @@ def open_browser():
 
 if __name__ == "__main__":
     threading.Thread(target=open_browser, daemon=True).start()
+    socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", PORT), Handler) as httpd:
         print(f"\n✅  Serving web demo at  http://localhost:{PORT}")
         print("   Press Ctrl+C to stop.\n")

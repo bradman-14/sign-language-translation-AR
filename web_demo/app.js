@@ -442,3 +442,10 @@ function formatDuration(start) {
   const s = (diff % 60).toString().padStart(2,'0');
   return `${m}:${s}`;
 }
+
+// ── Exports for camera.js ─────────────────────────────────────────
+window.addLog = addLog;
+window.setStandbyMode = setStandbyMode;
+window.setActiveMode = setActiveMode;
+window.triggerWakeAnimation = triggerWakeAnimation;
+window.handlePrediction = handlePrediction;

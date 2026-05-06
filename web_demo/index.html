@@ -8,6 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  
+  <!-- MediaPipe Client-Side Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -209,6 +214,17 @@
           <button id="btn-stop-sim" class="btn btn-outline" style="width:100%;margin-top:8px" disabled>■ Stop Simulation</button>
         </div>
 
+        <!-- LIVE CAMERA — Fully Browser Based -->
+        <div class="panel-card">
+          <div class="panel-title-row">
+            <h3 class="panel-title">📷 Live Camera</h3>
+            <span class="ar-badge" style="background:rgba(108,99,255,0.2);color:var(--accent)">WEB AR</span>
+          </div>
+          <p class="panel-desc">Run MediaPipe tracking entirely in the browser using your webcam. No Python backend required.</p>
+          <button id="btn-camera" class="btn btn-primary" style="width:100%" onclick="window.startCamera()">Start Camera</button>
+          <button id="btn-stop-camera" class="btn btn-outline" style="width:100%;margin-top:8px" onclick="window.stopCamera()" disabled>Stop Camera</button>
+        </div>
+
         <!-- LIVE BACKEND — Optional, requires Python running -->
         <div class="panel-card">
           <h3 class="panel-title">⚡ Live Backend (Optional)</h3>
@@ -247,7 +263,16 @@
               <div class="reticle-cross h"></div>
               <div class="reticle-cross v"></div>
             </div>
-            <!-- Skeletal overlay -->
+            <!-- Live Camera Feed (Hidden video, visible canvas) -->
+            <video id="camera-video" playsinline style="display:none"></video>
+            <canvas id="camera-canvas" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:5;"></canvas>
+            
+            <div id="camera-loading" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10; color:var(--accent2); flex-direction:column; justify-content:center; align-items:center; font-family:var(--mono); font-size:14px;">
+              <span class="live-dot" style="margin-bottom:12px; width:12px; height:12px;"></span>
+              Loading Models & Camera...
+            </div>
+
+            <!-- Skeletal overlay (for simulation) -->
             <div class="skeleton-overlay" id="skeleton-overlay">
               <canvas id="skeleton-canvas" width="560" height="315"></canvas>
             </div>
@@ -479,6 +504,8 @@
     </div>
   </footer>
 
+  <!-- App Scripts -->
+  <script src="camera.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
